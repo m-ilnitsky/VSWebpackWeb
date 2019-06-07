@@ -1,7 +1,19 @@
 ﻿$font-stack: "Helvetica Neue", Helvetica, Arial, sans-serif;
+
 $back-color: #343a40;
-$front-color: orangered;
-$hover-color: #343a40;
+$front-color: limegreen;
+
+$button-back: limegreen;
+$button-text: #343a40;
+$button-back-hover: limegreen;
+$button-text-hover: white;
+$button-back-active: green;
+$button-text-active: white;
+
+$circle-btn-back: limegreen;
+$circle-btn-back-hover: green;
+$circle-btn-back-active: white;
+
 
 @media screen and (min-width: 768px) {
     .phone-book_add-wrapper {
@@ -93,11 +105,15 @@ $hover-color: #343a40;
     vertical-align: middle;
     margin: 1px 5px;
     cursor: pointer;
-    background-color: $front-color;
+    background-color: $circle-btn-back;
     line-height: 15px;
 
     &:hover {
-        background-color: $hover-color;
+        background-color: $circle-btn-back-hover;
+    }
+
+    &:active {
+        background-color: $circle-btn-back-active;
     }
 }
 
@@ -119,7 +135,7 @@ $hover-color: #343a40;
 
 .modal,
 .phone-book {
-    .button {
+    .btn.button {
         font-size: 16px;
         display: inline-block;
         width: 120px;
@@ -130,15 +146,20 @@ $hover-color: #343a40;
         line-height: 15px;
         margin: 10px 3px;
         cursor: pointer;
-        background-color: $front-color;
-        color: white;
+        background-color: $button-back;
+        color: $button-text;
         font-weight: bold;
         padding: 5px;
-    }
 
-    .button:hover {
-        /*background-color: white;*/
-        color: $hover-color;
+        &:hover {
+            background-color: $button-back-hover;
+            color: $button-text-hover;
+        }
+
+        &:active {
+            background-color: $button-back-active;
+            color: $button-text-active;
+        }
     }
 }
 
@@ -203,10 +224,14 @@ $hover-color: #343a40;
 
         &.visible-button {
             cursor: pointer;
-            background-color: $front-color;
+            background-color: $circle-btn-back;
 
             &:hover {
-                background-color: $hover-color;
+                background-color: $circle-btn-back-hover;
+            }
+
+            &:active {
+                background-color: $circle-btn-back-active;
             }
         }
     }
@@ -220,7 +245,7 @@ $hover-color: #343a40;
 }
 
 
-/*Всплывающие подсказки*/
+/*Всплывающие уведомления*/
 
 #toastBoxPosition {
     position: fixed;

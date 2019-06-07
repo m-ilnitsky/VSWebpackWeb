@@ -418,7 +418,7 @@
         },
         computed: {
             filteredContacts: function () {
-                var str = this.filterString.trim();
+                const str = this.filterString.trim();
 
                 if (str === "") {
                     this.isFilter = false;
@@ -427,14 +427,11 @@
 
                 this.isFilter = true;
 
-                return this.contacts.filter(function (contact) {
-                    return contact.family.indexOf(str) >= 0
-                        || contact.name.indexOf(str) >= 0
-                        || contact.phone.indexOf(str) >= 0;
-                });
+                return this.contacts.filter(contact =>
+                    contact.family.includes(str) || contact.name.includes(str) || contact.phone.includes(str));
             },
             checkedContactsCount: function () {
-                return this.filteredContacts.reduce(function (number, contact) {
+                return this.filteredContacts.reduce((number, contact) => {
                     if (contact.checked) {
                         return number + 1;
                     }
@@ -461,14 +458,18 @@
         },
         methods: {
             getContactString: function (number) {
-                var twoDigits = number % 100;
-                var lastDigit = number % 10;
+                const twoDigits = number % 100;
+                const lastDigit = number % 10;
 
                 if ((twoDigits >= 5 && twoDigits <= 20) || (lastDigit === 0) || (lastDigit >= 5 && lastDigit <= 9)) {
                     return "контактов";
-                } else if (lastDigit === 1) {
+                }
+
+                if (lastDigit === 1) {
                     return "контакт";
-                } else if (lastDigit >= 2 && lastDigit <= 4) {
+                }
+
+                if (lastDigit >= 2 && lastDigit <= 4) {
                     return "контакта";
                 }
 
@@ -477,31 +478,21 @@
             checkAll: function () {
                 if (!this.checkedAll) {
                     this.checkedAll = true;
-                    this.contacts.forEach(function (element) {
-                        element.checked = true;
-                    });
+                    this.contacts.forEach(element => element.checked = true);
                 } else {
-                    if (this.contacts.every(function (element) {
-                        return element.checked;
-                    })) {
+                    if (this.contacts.every(element => element.checked)) {
                         this.checkedAll = false;
-                        this.contacts.forEach(function (element) {
-                            element.checked = false;
-                        });
+                        this.contacts.forEach(element => element.checked = false);
                     } else {
                         this.checkedAll = true;
-                        this.contacts.forEach(function (element) {
-                            element.checked = true;
-                        });
+                        this.contacts.forEach(element => element.checked = true);
                     }
                 }
             },
             check: function (contact) {
                 contact.checked = !contact.checked;
 
-                var isNoChecked = this.contacts.some(function (element) {
-                    return !element.checked;
-                });
+                const isNoChecked = this.contacts.some(element => !element.checked);
 
                 if (this.checkedAll && isNoChecked) {
                     this.checkedAll = false;
@@ -515,21 +506,21 @@
                 this.newContact.name = contact.name;
                 this.$refs.newPhone.focus();
             },
-            hasPhone: function (phoneNumber) {
-                var newPhone = phoneNumber.trim()
+            simplifyPhone: function (phoneNumber) {
+                return phoneNumber.trim()
                     .replace(/[+]/g, "")
                     .replace(/[(]/g, "")
                     .replace(/[)]/g, "")
                     .replace(/[-]/g, "");
+            },
+            hasPhone: function (phoneNumber) {
+                const newPhone = this.simplifyPhone(phoneNumber);
 
-                var isPhone = false;
+                let isPhone = false;
 
-                this.contacts.forEach(function (contact) {
-                    var phoneInRow = contact.phone.trim()
-                        .replace(/[+]/g, "")
-                        .replace(/[(]/g, "")
-                        .replace(/[)]/g, "")
-                        .replace(/[-]/g, "");
+                this.contacts.forEach(contact => {
+                    const phoneInRow = this.simplifyPhone(contact.phone);
+
                     if (phoneInRow === newPhone) {
                         isPhone = true;
                         return false;
@@ -539,11 +530,11 @@
                 return isPhone;
             },
             isCorrectPhone: function (phoneNumber) {
-                var phoneRegexp = /^(\+[0-9]+)?([(][0-9]+[)])?([\-0-9]+)?[0-9]$/;
+                const phoneRegexp = /^(\+[0-9]+)?([(][0-9]+[)])?([\-0-9]+)?[0-9]$/;
                 return phoneRegexp.test(phoneNumber);
             },
             loadContact: function (family, name, phone) {
-                var contact = {
+                const contact = {
                     id: this.id,
                     family: family,
                     name: name,
@@ -585,12 +576,13 @@
                     return;
                 }
 
-                var contact = {};
-                contact.id = this.id;
-                contact.family = this.newContact.family.trim();
-                contact.name = this.newContact.name.trim();
-                contact.phone = this.newContact.phone.trim();
-                contact.checked = false;
+                const contact = {
+                    id: this.id,
+                    family: this.newContact.family.trim(),
+                    name: this.newContact.name.trim(),
+                    phone: this.newContact.phone.trim(),
+                    checked: false
+                };
 
                 this.contacts.push(contact);
                 this.id++;
@@ -601,7 +593,7 @@
                 this.$refs.newPhone.focus();
             },
             removeContact: function () {
-                var index = this.contacts.indexOf(this.contactForRemove);
+                const index = this.contacts.indexOf(this.contactForRemove);
 
                 this.createToast("Удаление", "Удалён контакт: " + this.contacts[index].family + " " + this.contacts[index].name + " " + this.contacts[index].phone);
 
@@ -620,16 +612,13 @@
                 $(this.$refs.confirmDialogRemoveContact).modal("show");
             },
             removeCheckedContacts: function () {
-                var str = this.filterString.trim();
-                var oldCount = this.contacts.length;
+                const str = this.filterString.trim();
+                const oldCount = this.contacts.length;
 
-                this.contacts = this.contacts.filter(function (contact) {
-                    return (!contact.checked
-                        || (contact.family.indexOf(str) < 0 && contact.name.indexOf(str) < 0 && contact.phone.indexOf(str) < 0));
-                    // return !(contact.checked && (contact.family.indexOf(str) >= 0 || contact.name.indexOf(str) >= 0 || contact.phone.indexOf(str) >= 0));
-                });
+                this.contacts = this.contacts.filter(contact => !contact.checked
+                    || (!contact.family.includes(str) && !contact.name.includes(str) && !contact.phone.includes(str)));
 
-                var deleteCount = oldCount - this.contacts.length;
+                const deleteCount = oldCount - this.contacts.length;
 
                 this.createToast("Удаление", "Удалено " + deleteCount + " " + this.getContactString(deleteCount));
             },
@@ -637,9 +626,7 @@
                 if (this.checkedContactsCount === 0) {
                     $(this.$refs.messageDialog).modal("show");
                 } else if (this.checkedContactsCount === 1) {
-                    var checkedContacts = this.filteredContacts.filter(function (contact) {
-                        return contact.checked;
-                    });
+                    const checkedContacts = this.filteredContacts.filter(contact => contact.checked);
                     this.confirmRemove(checkedContacts[0]);
                 } else {
                     this.confirmDialog.message = "Вы действительно хотите удалить " + this.checkedContactsCount + " " + this.getContactString(this.checkedContactsCount) + "?";
@@ -721,9 +708,7 @@
                     return;
                 }
 
-                var checkedContacts = this.filteredContacts.filter(function (contact) {
-                    return contact.checked;
-                });
+                const checkedContacts = this.filteredContacts.filter(contact => contact.checked);
 
                 if (this.checkedContactsCount === 1) {
                     this.editContact(checkedContacts[0]);
@@ -734,28 +719,26 @@
                 }
             },
             editCheckedContacts: function () {
-                var checkedContacts = this.filteredContacts.filter(function (contact) {
-                    return contact.checked;
-                });
+                const checkedContacts = this.filteredContacts.filter(contact => contact.checked);
 
                 this.isEditing = false;
                 this.editIndex = 0;
 
-                var self = this;
-                //var count = 0;
+                //let count = 0;
 
-                var timerId = setInterval(function () {
+                const timerId = setInterval(() => {
                     //count++;
                     //console.log(count);
-                    if (self.editIndex >= checkedContacts.length || self.editIndex < 0) {
+                    if (this.editIndex >= checkedContacts.length || this.editIndex < 0) {
                         clearInterval(timerId);
                         return;
                     }
-                    if (!self.isEditing) {
-                        //console.log("self.editIndex = " + self.editIndex);
-                        self.isEditing = true;
-                        self.editContact(checkedContacts[self.editIndex]);
-                        self.editIndex++;
+
+                    if (!this.isEditing) {
+                        //console.log("this.editIndex = " + this.editIndex);
+                        this.isEditing = true;
+                        this.editContact(checkedContacts[this.editIndex]);
+                        this.editIndex++;
                     }
                 }, 50);
             },
@@ -769,19 +752,19 @@
                 $(this.$refs.confirmDialog).modal("hide");
             },
             createToast: function (title, message) {
-                var divToast = $("<div></div>").addClass("toast")
+                const divToast = $("<div></div>").addClass("toast")
                     .prop("role", "alert")
                     .prop("aria-live", "assertive")
                     .prop("aria-atomic", "true");
 
-                var divToastHeader = $("<div></div>").addClass("toast-header")
+                const divToastHeader = $("<div></div>").addClass("toast-header")
                     .appendTo(divToast);
 
                 $("<strong></strong>").addClass("mr-auto")
                     .text(title)
                     .appendTo(divToastHeader);
 
-                var buttonClose = $("<button></button>").addClass("ml-2 mb-1 close")
+                const buttonClose = $("<button></button>").addClass("ml-2 mb-1 close")
                     .prop("data-dismiss", "toast")
                     .prop("aria-label", "Close")
                     .click(function () {
