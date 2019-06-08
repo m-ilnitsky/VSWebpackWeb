@@ -1,18 +1,16 @@
-﻿const config = {
-    devtool: "source-map"
-};
-const path = require("path");
+﻿const path = require("path");
 
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
 module.exports = {
-    entry: "./src/phone_book.js",
+    entry: ["babel-polyfill", "./src/phone_book.js"],
     output: {
         filename: "result_phone_book.js",
         path: path.resolve(__dirname, "dist")
     },
+    devtool: "source-map",
     plugins: [
         new CleanWebpackPlugin(),
         new MiniCssExtractPlugin({
@@ -52,7 +50,7 @@ module.exports = {
                 use: {
                     loader: "babel-loader",
                     options: {
-                        presets:["@babel/preset-env"]
+                        presets: ["@babel/preset-env"]
                     }
                 }
             },
@@ -61,5 +59,5 @@ module.exports = {
                 use: "vue-loader"
             }
         ]
-    }    
+    }
 };

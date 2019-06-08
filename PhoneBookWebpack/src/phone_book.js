@@ -6,16 +6,21 @@ import Vue from "vue";
 import PhoneBook from "./PhoneBook.vue";
 
 (function () {
-    var app = new Vue({
+    const app = new Vue({
         el: "#App",
         template: "<phone-book ref='AppPhoneBook'/>",
         components: {
             "phone-book": PhoneBook
+        },
+        methods: {
+            loadContacts(contacts) {
+                contacts.forEach(contact => this.$refs.AppPhoneBook.loadContact(contact[0], contact[1], contact[2]));
+            }
         }
     });
 
     $(document).ready(function () {
-        var initialContacts = [
+        const initialContacts = [
             ["Иванов", "Василий", "123321"],
             ["Васильев", "Дмитрий", "234234"],
             ["Дмитриев", "Иоган", "345345"],
@@ -43,13 +48,7 @@ import PhoneBook from "./PhoneBook.vue";
             ["Мышкины", "", "123775"]
         ];
 
-        function createTestContacts(contacts) {
-            for (var i = 0; i < contacts.length; i++) {
-                app.$refs.AppPhoneBook.loadContact(contacts[i][0], contacts[i][1], contacts[i][2]);
-            }
-        }
-
-        createTestContacts(initialContacts);
+        app.loadContacts(initialContacts);
 
         $('[data-toggle="tooltip"]').tooltip({ container: "body" });
 

@@ -59,7 +59,19 @@ $circle-btn-back-active: white;
 
         td.column-checkbox,
         td.column-buttons {
+            background-color: $front-color;
+        }
+
+        .circle-button {
             background-color: $back-color;
+
+            &:hover {
+                background-color: $circle-btn-back-hover;
+            }
+
+            &:active {
+                background-color: $circle-btn-back-active;
+            }
         }
     }
 

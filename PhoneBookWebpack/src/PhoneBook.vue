@@ -370,13 +370,11 @@
 
     import $ from "jquery";
     import "bootstrap/dist/js/bootstrap.bundle.min";
-    import Vue from "vue";
 
     export default {
-        props: ["initialContacts"],
-        data: function () {
+        data() {
             return {
-                contacts: this.initialContacts || [],
+                contacts: [],
                 newContact: {
                     family: "",
                     name: "",
@@ -417,7 +415,7 @@
             }
         },
         computed: {
-            filteredContacts: function () {
+            filteredContacts() {
                 const str = this.filterString.trim();
 
                 if (str === "") {
@@ -430,7 +428,7 @@
                 return this.contacts.filter(contact =>
                     contact.family.includes(str) || contact.name.includes(str) || contact.phone.includes(str));
             },
-            checkedContactsCount: function () {
+            checkedContactsCount() {
                 return this.filteredContacts.reduce((number, contact) => {
                     if (contact.checked) {
                         return number + 1;
@@ -438,7 +436,7 @@
                     return number;
                 }, 0);
             },
-            filteredContactsCount: function () {
+            filteredContactsCount() {
                 if (this.contacts.length === 0) {
                     $(this.$refs.searchInput).popover("disable");
                     $(this.$refs.searchInput).popover("hide");
@@ -457,7 +455,7 @@
             }
         },
         methods: {
-            getContactString: function (number) {
+            getContactString(number) {
                 const twoDigits = number % 100;
                 const lastDigit = number % 10;
 
@@ -475,7 +473,7 @@
 
                 return "хм..мммм";
             },
-            checkAll: function () {
+            checkAll() {
                 if (!this.checkedAll) {
                     this.checkedAll = true;
                     this.contacts.forEach(element => element.checked = true);
@@ -489,7 +487,7 @@
                     }
                 }
             },
-            check: function (contact) {
+            check(contact) {
                 contact.checked = !contact.checked;
 
                 const isNoChecked = this.contacts.some(element => !element.checked);
@@ -498,22 +496,22 @@
                     this.checkedAll = false;
                 }
             },
-            resetFilter: function () {
+            resetFilter() {
                 this.filterString = "";
             },
-            copyContact: function (contact) {
+            copyContact(contact) {
                 this.newContact.family = contact.family;
                 this.newContact.name = contact.name;
                 this.$refs.newPhone.focus();
             },
-            simplifyPhone: function (phoneNumber) {
+            simplifyPhone(phoneNumber) {
                 return phoneNumber.trim()
                     .replace(/[+]/g, "")
                     .replace(/[(]/g, "")
                     .replace(/[)]/g, "")
                     .replace(/[-]/g, "");
             },
-            hasPhone: function (phoneNumber) {
+            hasPhone(phoneNumber) {
                 const newPhone = this.simplifyPhone(phoneNumber);
 
                 let isPhone = false;
@@ -529,11 +527,11 @@
 
                 return isPhone;
             },
-            isCorrectPhone: function (phoneNumber) {
+            isCorrectPhone(phoneNumber) {
                 const phoneRegexp = /^(\+[0-9]+)?([(][0-9]+[)])?([\-0-9]+)?[0-9]$/;
                 return phoneRegexp.test(phoneNumber);
             },
-            loadContact: function (family, name, phone) {
+            loadContact(family, name, phone) {
                 const contact = {
                     id: this.id,
                     family: family,
@@ -545,7 +543,7 @@
                 this.contacts.push(contact);
                 this.id++;
             },
-            addContact: function () {
+            addContact() {
                 this.newContact.isInvalidFamily = false;
                 this.newContact.isInvalidName = false;
                 this.newContact.isInvalidPhone = false;
@@ -592,7 +590,7 @@
                 this.newContact.phone = "";
                 this.$refs.newPhone.focus();
             },
-            removeContact: function () {
+            removeContact() {
                 const index = this.contacts.indexOf(this.contactForRemove);
 
                 this.createToast("Удаление", "Удалён контакт: " + this.contacts[index].family + " " + this.contacts[index].name + " " + this.contacts[index].phone);
@@ -601,7 +599,7 @@
 
                 $(this.$refs.confirmDialogRemoveContact).modal("hide");
             },
-            confirmRemove: function (contact) {
+            confirmRemove(contact) {
                 this.confirmRemoveContact.message = "Вы действительно хотите удалить контакт?";
                 this.confirmRemoveContact.family = contact.family;
                 this.confirmRemoveContact.name = contact.name;
@@ -611,7 +609,7 @@
 
                 $(this.$refs.confirmDialogRemoveContact).modal("show");
             },
-            removeCheckedContacts: function () {
+            removeCheckedContacts() {
                 const str = this.filterString.trim();
                 const oldCount = this.contacts.length;
 
@@ -622,7 +620,7 @@
 
                 this.createToast("Удаление", "Удалено " + deleteCount + " " + this.getContactString(deleteCount));
             },
-            confirmRemoveChecked: function () {
+            confirmRemoveChecked() {
                 if (this.checkedContactsCount === 0) {
                     $(this.$refs.messageDialog).modal("show");
                 } else if (this.checkedContactsCount === 1) {
@@ -634,12 +632,12 @@
                     $(this.$refs.confirmDialog).modal("show");
                 }
             },
-            cancelChange: function () {
+            cancelChange() {
                 $(this.$refs.editDialog).modal("hide");
                 this.isEditing = false;
                 this.editIndex = -1;
             },
-            applyChange: function () {
+            applyChange() {
                 this.editedContact.isInvalidFamily = false;
                 this.editedContact.isInvalidName = false;
                 this.editedContact.isInvalidPhone = false;
@@ -684,7 +682,7 @@
                 $(this.$refs.editDialog).modal("hide");
                 this.isEditing = false;
             },
-            editContact: function (contact) {
+            editContact(contact) {
                 this.editedContact.family = contact.family;
                 this.editedContact.name = contact.name;
                 this.editedContact.phone = contact.phone;
@@ -702,7 +700,7 @@
                 $(this.$refs.editDialog).modal("show");
                 this.$refs.editPhone.focus();
             },
-            confirmEditChecked: function () {
+            confirmEditChecked() {
                 if (this.checkedContactsCount === 0) {
                     $(this.$refs.messageDialog).modal("show");
                     return;
@@ -718,7 +716,7 @@
                     $(this.$refs.confirmDialog).modal("show");
                 }
             },
-            editCheckedContacts: function () {
+            editCheckedContacts() {
                 const checkedContacts = this.filteredContacts.filter(contact => contact.checked);
 
                 this.isEditing = false;
@@ -742,7 +740,7 @@
                     }
                 }, 50);
             },
-            confirm: function () {
+            confirm() {
                 if (this.confirmDialog.okButtonText === "Удалить все") {
                     this.removeCheckedContacts();
                 } else if (this.confirmDialog.okButtonText === "Изменить") {
@@ -751,7 +749,7 @@
 
                 $(this.$refs.confirmDialog).modal("hide");
             },
-            createToast: function (title, message) {
+            createToast(title, message) {
                 const divToast = $("<div></div>").addClass("toast")
                     .prop("role", "alert")
                     .prop("aria-live", "assertive")
