@@ -19,7 +19,7 @@ import PhoneBook from "./PhoneBook.vue";
         }
     });
 
-    $(document).ready(function () {
+    $(document).ready(() => {
         const initialContacts = [
             ["Иванов", "Василий", "123321"],
             ["Васильев", "Дмитрий", "234234"],
