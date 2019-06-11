@@ -26,9 +26,9 @@
                                id="edit-dialog_family"
                                ref="editFamily"
                                v-model="contact.family"
-                               :class="{'is-invalid': editedContact.isInvalidFamily}">
+                               :class="{'is-invalid': contact.isInvalidFamily}">
                         <div class="invalid-feedback">
-                            Нет ни имени ни фамилии.
+                            {{contact.invalidFamilyFeedback}}
                         </div>
                     </div>
                     <div class="form-group">
@@ -38,9 +38,9 @@
                                name="name"
                                id="edit-dialog_name"
                                v-model="contact.name"
-                               :class="{'is-invalid': editedContact.isInvalidName}">
+                               :class="{'is-invalid': contact.isInvalidName}">
                         <div class="invalid-feedback">
-                            Нет ни имени ни фамилии.
+                            {{contact.invalidNameFeedback}}
                         </div>
                     </div>
                     <div class="form-group">
@@ -51,10 +51,10 @@
                                id="edit-dialog_phone"
                                ref="editPhone"
                                v-model="contact.phone"
-                               :class="{'is-invalid': editedContact.isInvalidPhone}">
+                               :class="{'is-invalid': contact.isInvalidPhone}">
                         <div class="invalid-feedback"
                              id="edit-dialog_phone-feedback">
-                            {{invalidPhoneFeedback}}
+                            {{contact.invalidPhoneFeedback}}
                         </div>
                     </div>
                 </div>
@@ -83,6 +83,11 @@
     import "bootstrap/dist/js/bootstrap.bundle.min";
 
     export default {
-        props: ["title", "contact", "cancelFunction", "okFunction", "validateFunction"]
+        props: {
+            title: String,
+            contact: Object,
+            cancelFunction: Function,
+            okFunction: Function
+        }
     }
 </script>

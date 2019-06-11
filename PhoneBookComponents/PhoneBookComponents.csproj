@@ -72,6 +72,7 @@
     <Content Include="icon-close.png" />
     <Content Include="icon-edit.png" />
     <Content Include="phone_book.html" />
+    <Content Include="src\InputWithResetButton.vue" />
     <None Include="src\WindowForMessageDialog.vue" />
     <Content Include="src\phone_book.js" />
     <None Include="src\WindowForConfirmDialog.vue" />

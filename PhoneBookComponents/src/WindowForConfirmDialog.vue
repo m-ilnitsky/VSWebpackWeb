@@ -18,7 +18,7 @@
                     </button>
                 </div>
                 <div class="modal-body bg-dark text-white">
-                    <ul typeof="none">
+                    <ul style="list-style-type:none;">
                         <li v-for="line in lines">{{line}}</li>
                     </ul>
                 </div>
@@ -31,7 +31,7 @@
                     <button type="button"
                             class="button btn btn-primary"
                             @click="okFunction">
-                        {{okButtonText}}
+                        {{okText}}
                     </button>
                 </div>
             </div>
@@ -47,6 +47,11 @@
     import "bootstrap/dist/js/bootstrap.bundle.min";
 
     export default {
-        props: ["title", "lines", "okButtonText", "okFunction"]
+        props: {
+            title: String,
+            lines: [Array, Object],
+            okText: String,
+            okFunction: Function
+        }
     }
 </script>

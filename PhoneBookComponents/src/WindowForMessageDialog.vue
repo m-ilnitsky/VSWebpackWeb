@@ -41,6 +41,10 @@
     import "bootstrap/dist/js/bootstrap.bundle.min";
 
     export default {
-        props: ["title", "topMessage", "bottomMessage"]
+        props: {
+            title: String,
+            topMessage: String,
+            bottomMessage: String
+        }
     }
 </script>

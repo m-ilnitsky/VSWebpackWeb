@@ -182,157 +182,23 @@
                         top-message="Не выбрано ни одного контакта!"
                         bottom-message="Для выполнения операции выберите контакты!" />
 
-        <div ref="confirmDialogRemoveContact"
-             class="modal"
-             tabindex="-1"
-             role="dialog"
-             aria-labelledby="exampleModalLabel"
-             aria-hidden="true">
-            <div class="modal-dialog"
-                 role="document">
-                <div class="modal-content">
-                    <div class="modal-header text-white">
-                        <h5 class="modal-title">Запрос подтверждения</h5>
-                        <button type="button"
-                                class="close"
-                                data-dismiss="modal"
-                                aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body bg-dark text-white">
-                        {{confirmRemoveContact.message}}<br>
-                        {{confirmRemoveContact.family}}<br>
-                        {{confirmRemoveContact.name}}<br>
-                        {{confirmRemoveContact.phone}}
-                    </div>
-                    <div class="modal-footer bg-dark text-white">
-                        <button type="button"
-                                class="button btn btn-secondary"
-                                data-dismiss="modal">
-                            Отменить
-                        </button>
-                        <button type="button"
-                                class="button btn btn-primary"
-                                @click="removeContact">
-                            Удалить
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <confirm-dialog ref="confirmDialog"
+                        title="Запрос подтверждения"
+                        :lines="[confirmDialog.message]"
+                        :ok-text="confirmDialog.okButtonText"
+                        :ok-function="confirm" />
 
-        <div ref="confirmDialog"
-             class="modal"
-             tabindex="-1"
-             role="dialog"
-             aria-labelledby="exampleModalLabel"
-             aria-hidden="true">
-            <div class="modal-dialog"
-                 role="document">
-                <div class="modal-content">
-                    <div class="modal-header text-white">
-                        <h5 class="modal-title">Запрос подтверждения</h5>
-                        <button type="button"
-                                class="close"
-                                data-dismiss="modal"
-                                aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body bg-dark text-white"
-                         v-text="confirmDialog.message">
-                    </div>
-                    <div class="modal-footer bg-dark text-white">
-                        <button type="button"
-                                class="button btn btn-secondary"
-                                data-dismiss="modal">
-                            Отменить
-                        </button>
-                        <button type="button"
-                                class="button btn btn-primary"
-                                @click="confirm">
-                            {{confirmDialog.okButtonText}}
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <confirm-dialog ref="confirmDialogRemoveContact"
+                        title="Запрос подтверждения"
+                        :lines="confirmRemoveContact"
+                        ok-text="Удалить"
+                        :ok-function="removeContact" />
 
-        <div ref="editDialog"
-             class="modal"
-             tabindex="-1"
-             role="dialog"
-             aria-labelledby="exampleModalLabel"
-             aria-hidden="true">
-            <div class="modal-dialog"
-                 role="document">
-                <div class="modal-content">
-                    <div class="modal-header text-white">
-                        <h5 class="modal-title">Изменение данных контакта</h5>
-                        <button type="button"
-                                class="close"
-                                data-dismiss="modal"
-                                aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                        </button>
-                    </div>
-                    <div class="modal-body bg-dark text-white">
-                        <div class="form-group">
-                            <label for="edit-dialog_family">Фамилия </label>
-                            <input type="text"
-                                   class="form-control"
-                                   name="family"
-                                   id="edit-dialog_family"
-                                   ref="editFamily"
-                                   v-model="editedContact.family"
-                                   :class="{'is-invalid': editedContact.isInvalidFamily}">
-                            <div class="invalid-feedback">
-                                Нет ни имени ни фамилии.
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-dialog_name">Имя </label>
-                            <input type="text"
-                                   class="form-control"
-                                   name="name"
-                                   id="edit-dialog_name"
-                                   v-model="editedContact.name"
-                                   :class="{'is-invalid': editedContact.isInvalidName}">
-                            <div class="invalid-feedback">
-                                Нет ни имени ни фамилии.
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-dialog_phone">Телефон </label>
-                            <input type="text"
-                                   class="form-control"
-                                   name="phone"
-                                   id="edit-dialog_phone"
-                                   ref="editPhone"
-                                   v-model="editedContact.phone"
-                                   :class="{'is-invalid': editedContact.isInvalidPhone}">
-                            <div class="invalid-feedback"
-                                 id="edit-dialog_phone-feedback">
-                                {{editedContact.invalidPhoneFeedback}}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer bg-dark text-white">
-                        <button type="button"
-                                class="button btn btn-secondary"
-                                @click="cancelChange">
-                            Отменить
-                        </button>
-                        <button type="button"
-                                class="button btn btn-primary"
-                                @click="applyChange">
-                            Применить
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <edit-dialog ref="editDialog"
+                     title="Изменение данных контакта"
+                     :contact="editedContact"
+                     :cancel-function="cancelChange"
+                     :ok-function="applyChange" />
 
     </div>
 </template>
@@ -345,8 +211,8 @@
     import "bootstrap/dist/js/bootstrap.bundle.min";
 
     import WindowForMessageDialog from "./WindowForMessageDialog.vue";
-    //import WindowForConfirmDialog from "./WindowForConfirmDialog.vue";
-    //import WindowForEditContactDialogVue from "./WindowForEditContactDialog.vue";
+    import WindowForConfirmDialog from "./WindowForConfirmDialog.vue";
+    import WindowForEditContactDialog from "./WindowForEditContactDialog.vue";
 
     export default {
         data() {
@@ -369,6 +235,8 @@
                     isInvalidFamily: false,
                     isInvalidName: false,
                     isInvalidPhone: false,
+                    invalidFamilyFeedback: "Нет ни имени ни фамилии.",
+                    invalidNameFeedback: "Нет ни имени ни фамилии.",
                     invalidPhoneFeedback: ""
                 },
                 id: 0,
@@ -392,9 +260,9 @@
             }
         },
         components: {
-            "message-dialog": WindowForMessageDialog//,
-            //"confirm-dialog": WindowForConfirmDialog,
-            //"edit-dialog": WindowForEditContactDialog
+            "message-dialog": WindowForMessageDialog,
+            "confirm-dialog": WindowForConfirmDialog,
+            "edit-dialog": WindowForEditContactDialog
         },
         computed: {
             filteredContacts() {
@@ -579,7 +447,7 @@
 
                 this.contacts.splice(index, 1);
 
-                $(this.$refs.confirmDialogRemoveContact).modal("hide");
+                $(this.$refs.confirmDialogRemoveContact.$el).modal("hide");
             },
             confirmRemove(contact) {
                 this.confirmRemoveContact.message = "Вы действительно хотите удалить контакт?";
@@ -589,7 +457,7 @@
 
                 this.contactForRemove = contact;
 
-                $(this.$refs.confirmDialogRemoveContact).modal("show");
+                $(this.$refs.confirmDialogRemoveContact.$el).modal("show");
             },
             removeCheckedContacts() {
                 const str = this.filterString.trim();
@@ -611,11 +479,11 @@
                 } else {
                     this.confirmDialog.message = "Вы действительно хотите удалить " + this.checkedContactsCount + " " + this.getContactString(this.checkedContactsCount) + "?";
                     this.confirmDialog.okButtonText = "Удалить все";
-                    $(this.$refs.confirmDialog).modal("show");
+                    $(this.$refs.confirmDialog.$el).modal("show");
                 }
             },
             cancelChange() {
-                $(this.$refs.editDialog).modal("hide");
+                $(this.$refs.editDialog.$el).modal("hide");
                 this.isEditing = false;
                 this.editIndex = -1;
             },
@@ -641,12 +509,12 @@
                 }
 
                 if (this.editedContact.isInvalidFamily || this.editedContact.isInvalidName) {
-                    this.$refs.editFamily.focus();
+                    this.$refs.editDialog.$refs.editFamily.focus();
                     return;
                 }
 
                 if (this.editedContact.isInvalidPhone) {
-                    this.$refs.editPhone.focus();
+                    this.$refs.editDialog.$refs.editPhone.focus();
                     return;
                 }
 
@@ -661,7 +529,7 @@
                     this.createToast("Редактирование", "Изменён контакт: " + this.editedContact.family + " " + this.editedContact.name + " " + this.editedContact.phone);
                 }
 
-                $(this.$refs.editDialog).modal("hide");
+                $(this.$refs.editDialog.$el).modal("hide");
                 this.isEditing = false;
             },
             editContact(contact) {
@@ -679,8 +547,8 @@
 
                 this.contactForEdit = contact;
 
-                $(this.$refs.editDialog).modal("show");
-                this.$refs.editPhone.focus();
+                $(this.$refs.editDialog.$el).modal("show");
+                this.$refs.editDialog.$refs.editPhone.focus();
             },
             confirmEditChecked() {
                 if (this.checkedContactsCount === 0) {
@@ -695,7 +563,7 @@
                 } else {
                     this.confirmDialog.message = "Вы действительно хотите изменить " + this.checkedContactsCount + " " + this.getContactString(this.checkedContactsCount) + "?";
                     this.confirmDialog.okButtonText = "Изменить";
-                    $(this.$refs.confirmDialog).modal("show");
+                    $(this.$refs.confirmDialog.$el).modal("show");
                 }
             },
             editCheckedContacts() {
@@ -729,7 +597,7 @@
                     this.editCheckedContacts();
                 }
 
-                $(this.$refs.confirmDialog).modal("hide");
+                $(this.$refs.confirmDialog.$el).modal("hide");
             },
             createToast(title, message) {
                 const divToast = $("<div></div>").addClass("toast")
