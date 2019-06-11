@@ -182,14 +182,20 @@ $circle-btn-back-active: white;
 
 /*Поле ввода*/
 
-.form-group input[type="text"].form-control {
-    height: 30px;
-    border-radius: 15px;
-    border: none;
-    padding: 5px 5px 5px 15px;
-    color: $back-color;
-    font-weight: bold;
-    outline: none;
+.form-group {
+    input[type="text"],
+    input[type="search"],
+    input[type="tel"] {
+        &.form-control {
+            height: 30px;
+            border-radius: 15px;
+            border: none;
+            padding: 5px 5px 5px 15px;
+            color: $back-color;
+            font-weight: bold;
+            outline: none;
+        }
+    }
 }
 
 

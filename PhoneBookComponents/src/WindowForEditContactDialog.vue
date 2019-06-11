@@ -1,15 +1,13 @@
 ﻿<template>
-    <div ref="editDialog"
-         class="modal"
+    <div class="modal"
          tabindex="-1"
          role="dialog"
          aria-labelledby="exampleModalLabel"
          aria-hidden="true">
-        <div class="modal-dialog"
-             role="document">
+        <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header text-white">
-                    <h5 class="modal-title">{{title}}</h5>
+                    <h5 class="modal-title">{{ title }}</h5>
                     <button type="button"
                             class="close"
                             data-dismiss="modal"
@@ -28,7 +26,7 @@
                                v-model="contact.family"
                                :class="{'is-invalid': contact.isInvalidFamily}">
                         <div class="invalid-feedback">
-                            {{contact.invalidFamilyFeedback}}
+                            {{ contact.invalidFamilyFeedback }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -40,7 +38,7 @@
                                v-model="contact.name"
                                :class="{'is-invalid': contact.isInvalidName}">
                         <div class="invalid-feedback">
-                            {{contact.invalidNameFeedback}}
+                            {{ contact.invalidNameFeedback }}
                         </div>
                     </div>
                     <div class="form-group">
@@ -54,7 +52,7 @@
                                :class="{'is-invalid': contact.isInvalidPhone}">
                         <div class="invalid-feedback"
                              id="edit-dialog_phone-feedback">
-                            {{contact.invalidPhoneFeedback}}
+                            {{ contact.invalidPhoneFeedback }}
                         </div>
                     </div>
                 </div>
@@ -76,18 +74,26 @@
 </template>
 
 <script>
-    import "bootstrap/dist/css/bootstrap.min.css";
-    import "./PhoneBook.scss";
-
-    import $ from "jquery";
     import "bootstrap/dist/js/bootstrap.bundle.min";
 
     export default {
         props: {
-            title: String,
-            contact: Object,
-            cancelFunction: Function,
-            okFunction: Function
+            title: {
+                type: String,
+                default: "Редактирование"
+            },
+            contact: {
+                type: Object,
+                required: true
+            },
+            cancelFunction: {
+                type: Function,
+                required: true
+            },
+            okFunction: {
+                type: Function,
+                required: true
+            }
         }
     }
 </script>

@@ -8,8 +8,10 @@
                     </div>
                     <div class="form-group">
                         <label for="add-dialog_family">Фамилия </label>
-                        <input type="text" class="form-control"
-                               name="family" id="add-dialog_family"
+                        <input type="search"
+                               class="form-control"
+                               name="family"
+                               id="add-dialog_family"
                                placeholder="Ввести фамилию"
                                data-toggle="tooltip"
                                data-placement="auto"
@@ -23,7 +25,7 @@
                     </div>
                     <div class="form-group">
                         <label for="add-dialog_name">Имя </label>
-                        <input type="text"
+                        <input type="search"
                                class="form-control"
                                name="name"
                                id="add-dialog_name"
@@ -39,7 +41,7 @@
                     </div>
                     <div class="form-group">
                         <label for="add-dialog_phone">Телефон </label>
-                        <input type="text"
+                        <input type="tel"
                                class="form-control"
                                name="phone"
                                id="add-dialog_phone"
@@ -52,7 +54,7 @@
                                :class="{'is-invalid': newContact.isInvalidPhone}">
                         <div class="invalid-feedback"
                              id="add-dialog_phone-feedback">
-                            {{newContact.invalidPhoneFeedback}}
+                            {{ newContact.invalidPhoneFeedback }}
                         </div>
                     </div>
                     <button type="submit"

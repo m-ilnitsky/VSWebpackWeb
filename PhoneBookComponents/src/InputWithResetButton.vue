@@ -18,20 +18,37 @@
 </template>
 
 <script>
-    import "bootstrap/dist/css/bootstrap.min.css";
-    import "./PhoneBook.scss";
-
-    //import $ from "jquery";
     import "bootstrap/dist/js/bootstrap.bundle.min";
 
     export default {
         props: {
-            inputType: String,
-            placeholder: String,
-            popoverText: String,
-            showPopover: Boolean,
-            buttonTitle: String,
-            onChangeFunction: Function
+            inputType: {
+                type: String,
+                default: "text",
+                validator: function (value) {
+                    return ["text", "email", "search", "tel", "url"].indexOf(value) !== -1;
+                }
+            },
+            placeholder: {
+                type: String,
+                default: ""
+            },
+            popoverText: {
+                type: String,
+                default: ""
+            },
+            showPopover: {
+                type: Boolean,
+                default: false
+            },
+            buttonTitle: {
+                type: String,
+                default: "Очистить"
+            },
+            onChangeFunction: {
+                type: Function,
+                required: true
+            }
         },
         data() {
             return {
