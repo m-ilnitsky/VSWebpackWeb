@@ -74,7 +74,7 @@
     <Content Include="phone_book.html" />
     <Content Include="src\InputWithResetButton.vue" />
     <None Include="src\WindowForMessageDialog.vue" />
-    <Content Include="src\phone_book.js" />
+    <Content Include="src\App.js" />
     <None Include="src\WindowForConfirmDialog.vue" />
     <None Include="src\WindowForEditContactDialog.vue" />
     <Content Include="Web.config" />

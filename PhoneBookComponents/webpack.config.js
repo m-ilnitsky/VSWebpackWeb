@@ -5,16 +5,16 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const VueLoaderPlugin = require("vue-loader/lib/plugin");
 
 module.exports = {
-    entry: ["babel-polyfill", "./src/phone_book.js"],
+    entry: ["babel-polyfill", "./src/App.js"],
     output: {
-        filename: "result_phone_book.js",
+        filename: "phone_book.js",
         path: path.resolve(__dirname, "dist")
     },
     devtool: "source-map",
     plugins: [
         new CleanWebpackPlugin(),
         new MiniCssExtractPlugin({
-            filename: "result_phone_book.css"
+            filename: "phone_book.css"
         }),
         new VueLoaderPlugin()
     ],

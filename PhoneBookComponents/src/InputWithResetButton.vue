@@ -78,6 +78,9 @@
             },
             onInput() {
                 this.$emit("update:text", this.inputString);
+            },
+            focus() {
+                this.$refs.input.focus();
             }
         },
         mounted() {

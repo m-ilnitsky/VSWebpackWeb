@@ -14,7 +14,6 @@
                                id="add-dialog_family"
                                placeholder="Ввести фамилию"
                                data-toggle="tooltip"
-                               data-placement="auto"
                                title="Можно не вводить если введено имя"
                                ref="newFamily"
                                v-model="newContact.family"
@@ -31,8 +30,8 @@
                                id="add-dialog_name"
                                placeholder="Ввести имя"
                                data-toggle="tooltip"
-                               data-placement="auto"
                                title="Можно не вводить если введена фамилия"
+                               ref="newName"
                                v-model="newContact.name"
                                :class="{'is-invalid': newContact.isInvalidName}">
                         <div class="invalid-feedback">
@@ -47,7 +46,6 @@
                                id="add-dialog_phone"
                                placeholder="Ввести телефон"
                                data-toggle="tooltip"
-                               data-placement="auto"
                                title="Нужен корректный телефонный номер не совпадающий с уже имеющимися"
                                ref="newPhone"
                                v-model="newContact.phone"
@@ -248,7 +246,8 @@
                 confirmDialog: {
                     message: "",
                     okButtonText: ""
-                }
+                },
+                windowWidth: window.innerWidth
             }
         },
         components: {
@@ -258,6 +257,16 @@
             "search-input": InputWithResetButton
         },
         computed: {
+            isLargeWidth() {
+                return this.windowWidth >= 768;
+            },
+            tooltipPlacement() {
+                if (this.isLargeWidth) {
+                    return "right";
+                }
+
+                return "bottom";
+            },
             filteredContacts() {
                 const str = this.filterString.trim();
 
@@ -378,6 +387,9 @@
 
                 this.contacts.push(contact);
                 this.id++;
+            },
+            loadContacts(contacts) {
+                contacts.forEach(contact => this.loadContact(contact.family, contact.name, contact.phone));
             },
             addContact() {
                 this.newContact.isInvalidFamily = false;
@@ -618,6 +630,22 @@
                 divToast.toast({ delay: 60000 });
                 divToast.toast("show");
             }
+        },
+        mounted() {
+            window.onresize = () => {
+                this.windowWidth = window.innerWidth;
+            };
+
+            const self = this;
+
+            $([this.$refs.newFamily, this.$refs.newName, this.$refs.newPhone]).tooltip({
+                container: "body",
+                placement() {
+                    return self.tooltipPlacement;
+                }
+            });
+
+            this.$refs.searchInput.focus();
         }
     }
 </script>
