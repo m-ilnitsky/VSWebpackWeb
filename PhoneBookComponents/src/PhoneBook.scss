@@ -1,4 +1,6 @@
-﻿$font-stack: "Helvetica Neue", Helvetica, Arial, sans-serif;
+﻿@import "../node_modules/bootstrap/dist/css/bootstrap.min.css";
+
+$font-stack: "Helvetica Neue", Helvetica, Arial, sans-serif;
 
 $back-color: #343a40;
 $front-color: limegreen;

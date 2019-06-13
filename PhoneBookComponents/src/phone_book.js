@@ -52,9 +52,6 @@ import PhoneBook from "./PhoneBook.vue";
 
         $('[data-toggle="tooltip"]').tooltip({ container: "body" });
 
-        $(app.$refs.AppPhoneBook.$refs.searchInput).popover({ container: "body" });
-        $(app.$refs.AppPhoneBook.$refs.searchInput).popover("disable");
-
         $(app.$refs.AppPhoneBook.$refs.searchInput).focus();
     });
 })();

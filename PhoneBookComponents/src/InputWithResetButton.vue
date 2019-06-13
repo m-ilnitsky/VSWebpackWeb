@@ -6,7 +6,9 @@
                data-toggle="popover"
                data-placement="bottom"
                :data-content="popoverText"
-               :v-model="inputString">
+               v-model="inputString"
+               @input="onInput"
+               ref="input">
         <div class="search-reset-button"
              :class="{'visible-button': isText}"
              @click="reset">
@@ -18,15 +20,20 @@
 </template>
 
 <script>
+    import $ from "jquery";
     import "bootstrap/dist/js/bootstrap.bundle.min";
 
     export default {
         props: {
+            text: {
+                type: String,
+                required: true
+            },
             inputType: {
                 type: String,
                 default: "text",
                 validator: function (value) {
-                    return ["text", "email", "search", "tel", "url"].indexOf(value) !== -1;
+                    return ["text", "email", "tel", "url"].indexOf(value) !== -1;
                 }
             },
             placeholder: {
@@ -37,6 +44,10 @@
                 type: String,
                 default: ""
             },
+            trimed: {
+                type: Boolean,
+                default: false
+            },
             showPopover: {
                 type: Boolean,
                 default: false
@@ -44,25 +55,42 @@
             buttonTitle: {
                 type: String,
                 default: "Очистить"
-            },
-            onChangeFunction: {
-                type: Function,
-                required: true
             }
         },
         data() {
             return {
-                inputString: ""
+                inputString: this.text
             }
         },
         computed: {
             isText() {
-                return this.inputString.trim() === "";
+                if (this.trimed) {
+                    return this.inputString.trim() !== "";
+                }
+
+                return this.inputString !== "";
             }
         },
         methods: {
             reset() {
                 this.inputString = "";
+                this.onInput();
+            },
+            onInput() {
+                this.$emit("update:text", this.inputString);
+            }
+        },
+        mounted() {
+            $(this.$refs.input.$el).popover({ container: "body" });
+            $(this.$refs.input.$el).popover("disable");
+        },
+        beforeUpdate() {
+            if (this.isText && this.showPopover) {
+                $(this.$refs.input).popover("enable");
+                $(this.$refs.input).popover("show");
+            } else {
+                $(this.$refs.input).popover("disable");
+                $(this.$refs.input).popover("hide");
             }
         }
     }

@@ -8,7 +8,7 @@
                     </div>
                     <div class="form-group">
                         <label for="add-dialog_family">Фамилия </label>
-                        <input type="search"
+                        <input type="text"
                                class="form-control"
                                name="family"
                                id="add-dialog_family"
@@ -25,7 +25,7 @@
                     </div>
                     <div class="form-group">
                         <label for="add-dialog_name">Имя </label>
-                        <input type="search"
+                        <input type="text"
                                class="form-control"
                                name="name"
                                id="add-dialog_name"
@@ -41,7 +41,7 @@
                     </div>
                     <div class="form-group">
                         <label for="add-dialog_phone">Телефон </label>
-                        <input type="tel"
+                        <input type="text"
                                class="form-control"
                                name="phone"
                                id="add-dialog_phone"
@@ -83,26 +83,14 @@
                             @click="confirmRemoveChecked">
                         Удалить
                     </button>
-                    <div class="search-wrapper">
-                        <input type="text"
-                               class="search-input"
-                               id="search-input"
-                               placeholder="Найти"
-                               data-toggle="popover"
-                               data-placement="bottom"
-                               title="Поиск"
-                               data-content="Не найдено ни одного совпадения!"
-                               ref="searchInput"
-                               v-model="filterString">
-                        <div class="search-reset-button"
-                             id="search-reset-button"
-                             :class="{'visible-button': isFilter}"
-                             @click="resetFilter">
-                            <img src="icon-close.png"
-                                 alt="x"
-                                 title="Очистить поле поиска">
-                        </div>
-                    </div>
+                    <search-input ref="searchInput"
+                                  input-type="text"
+                                  placeholder="Найти"
+                                  popover-text="Не найдено ни одного совпадения!"
+                                  :trimed="true"
+                                  button-title="Очистить поле поиска"
+                                  :text.sync="filterString"
+                                  :show-popover="!isFilteredRows" />
                 </div>
                 <table class="table table-sm table-striped table-hover phone-book_table">
                     <thead class="thead-dark">
@@ -206,7 +194,6 @@
 </template>
 
 <script>
-    import "bootstrap/dist/css/bootstrap.min.css";
     import "./PhoneBook.scss";
 
     import $ from "jquery";
@@ -215,6 +202,8 @@
     import WindowForMessageDialog from "./WindowForMessageDialog.vue";
     import WindowForConfirmDialog from "./WindowForConfirmDialog.vue";
     import WindowForEditContactDialog from "./WindowForEditContactDialog.vue";
+
+    import InputWithResetButton from "./InputWithResetButton.vue";
 
     export default {
         data() {
@@ -246,6 +235,7 @@
                 editIndex: -1,
                 filterString: "",
                 isFilter: false,
+                isFilteredRows: true,
                 checkedAll: false,
                 contactForRemove: {},
                 contactForEdit: {},
@@ -264,7 +254,8 @@
         components: {
             "message-dialog": WindowForMessageDialog,
             "confirm-dialog": WindowForConfirmDialog,
-            "edit-dialog": WindowForEditContactDialog
+            "edit-dialog": WindowForEditContactDialog,
+            "search-input": InputWithResetButton
         },
         computed: {
             filteredContacts() {
@@ -290,18 +281,11 @@
             },
             filteredContactsCount() {
                 if (this.contacts.length === 0) {
-                    $(this.$refs.searchInput).popover("disable");
-                    $(this.$refs.searchInput).popover("hide");
+                    this.isFilteredRows = true;
                     return 0;
                 }
 
-                if (this.filteredContacts.length > 0) {
-                    $(this.$refs.searchInput).popover("disable");
-                    $(this.$refs.searchInput).popover("hide");
-                } else {
-                    $(this.$refs.searchInput).popover("enable");
-                    $(this.$refs.searchInput).popover("show");
-                }
+                this.isFilteredRows = this.filteredContacts.length > 0;
 
                 return this.filteredContacts.length;
             }
