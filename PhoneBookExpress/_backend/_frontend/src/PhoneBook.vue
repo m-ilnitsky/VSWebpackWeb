@@ -83,6 +83,7 @@
                     </button>
                     <search-input ref="searchInput"
                                   input-type="text"
+                                  reactionOn="change"
                                   placeholder="Найти"
                                   popover-text="Не найдено ни одного совпадения!"
                                   :trimed="true"
@@ -108,7 +109,7 @@
                         </tr>
                     </thead>
                     <tbody id="table-body">
-                        <tr v-cloak v-for="(contact, index) in filteredContacts"
+                        <tr v-cloak v-for="(contact, index) in contacts"
                             :key="contact.id"
                             :class="{'checked-row': contact.checked}">
                             <td class="column-number" v-cloak v-text="index+1"></td>
@@ -200,8 +201,9 @@
     import WindowForMessageDialog from "./WindowForMessageDialog.vue";
     import WindowForConfirmDialog from "./WindowForConfirmDialog.vue";
     import WindowForEditContactDialog from "./WindowForEditContactDialog.vue";
-
     import InputWithResetButton from "./InputWithResetButton.vue";
+
+    import PhoneBookService from "./PhoneBookService.js";
 
     export default {
         data() {
@@ -247,7 +249,8 @@
                     message: "",
                     okButtonText: ""
                 },
-                windowWidth: window.innerWidth
+                windowWidth: window.innerWidth,
+                service: new PhoneBookService()
             }
         },
         components: {
@@ -299,7 +302,20 @@
                 return this.filteredContacts.length;
             }
         },
+        watch: {
+            filterString(newString) {
+                this.loadContacts(newString);
+
+                this.isFilteredRows = this.contacts.length > 0;
+            }
+        },
         methods: {
+            loadContacts(filter) {
+                this.service.getContacts(filter)
+                    .done(response => this.contacts = response.contacts)
+                    .fail()
+                    .always();
+            },
             getContactString(number) {
                 const twoDigits = number % 100;
                 const lastDigit = number % 10;
@@ -376,21 +392,6 @@
                 const phoneRegexp = /^(\+[0-9]+)?([(][0-9]+[)])?([\-0-9]+)?[0-9]$/;
                 return phoneRegexp.test(phoneNumber);
             },
-            loadContact(family, name, phone) {
-                const contact = {
-                    id: this.id,
-                    family: family,
-                    name: name,
-                    phone: phone,
-                    checked: false
-                };
-
-                this.contacts.push(contact);
-                this.id++;
-            },
-            loadContacts(contacts) {
-                contacts.forEach(contact => this.loadContact(contact.family, contact.name, contact.phone));
-            },
             addContact() {
                 this.newContact.isInvalidFamily = false;
                 this.newContact.isInvalidName = false;
@@ -423,27 +424,32 @@
                 }
 
                 const contact = {
-                    id: this.id,
                     family: this.newContact.family.trim(),
                     name: this.newContact.name.trim(),
-                    phone: this.newContact.phone.trim(),
-                    checked: false
+                    phone: this.newContact.phone.trim()
                 };
 
-                this.contacts.push(contact);
-                this.id++;
+                this.service.addContact(contact)
+                    .done(() => {
+                        this.createToast("Создание", "Добавлен контакт: " + this.newContact.family + " " + this.newContact.name + " " + this.newContact.phone);
+                    })
+                    .fail()
+                    .always();
 
-                this.createToast("Создание", "Добавлен контакт: " + this.newContact.family + " " + this.newContact.name + " " + this.newContact.phone);
+                this.loadContacts(this.filterString);
 
                 this.newContact.phone = "";
                 this.$refs.newPhone.focus();
             },
             removeContact() {
-                const index = this.contacts.indexOf(this.contactForRemove);
+                this.service.deleteContact(this.contactForRemove.id)
+                    .done(() => {
+                        this.createToast("Удаление", "Удалён контакт: " + this.contactForRemove.family + " " + this.contactForRemove.name + " " + this.contactForRemove.phone);
+                    })
+                    .fail()
+                    .always();
 
-                this.createToast("Удаление", "Удалён контакт: " + this.contacts[index].family + " " + this.contacts[index].name + " " + this.contacts[index].phone);
-
-                this.contacts.splice(index, 1);
+                this.loadContacts(this.filterString);
 
                 $(this.$refs.confirmDialogRemoveContact.$el).modal("hide");
             },
@@ -644,6 +650,11 @@
                     return self.tooltipPlacement;
                 }
             });
+
+            this.service.getContacts("")
+                .done(response => this.contacts = response.contacts)
+                .fail()
+                .always();
 
             this.$refs.searchInput.focus();
         }

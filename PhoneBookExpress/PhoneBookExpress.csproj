@@ -74,8 +74,8 @@
     <Content Include="_backend\_frontend\icon-add.png" />
     <Content Include="_backend\_frontend\icon-close.png" />
     <Content Include="_backend\_frontend\icon-edit.png" />
-    <Content Include="_backend\_frontend\phone_book.html" />
     <Content Include="_backend\_frontend\src\App.js" />
+    <Content Include="_backend\_frontend\src\PhoneBookService.js" />
     <Content Include="_backend\_frontend\webpack.config.js" />
   </ItemGroup>
   <ItemGroup>

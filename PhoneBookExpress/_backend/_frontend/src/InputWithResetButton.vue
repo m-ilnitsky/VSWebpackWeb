@@ -8,6 +8,7 @@
                :data-content="popoverText"
                v-model="inputString"
                @input="onInput"
+               @change="onChange"
                ref="input">
         <div class="search-reset-button"
              :class="{'visible-button': isText}"
@@ -29,10 +30,17 @@
                 type: String,
                 required: true
             },
+            reactionOn: {
+                type: String,
+                required: true,
+                validator(value) {
+                    return ["input", "change"].indexOf(value) !== -1;
+                }
+            },
             inputType: {
                 type: String,
                 default: "text",
-                validator: function (value) {
+                validator(value) {
                     return ["text", "email", "tel", "url"].indexOf(value) !== -1;
                 }
             },
@@ -59,7 +67,9 @@
         },
         data() {
             return {
-                inputString: this.text
+                inputString: this.text,
+                reactOnInput: (this.reactionOn === "input"),
+                reactOnChange: (this.reactionOn === "change")
             }
         },
         computed: {
@@ -74,10 +84,24 @@
         methods: {
             reset() {
                 this.inputString = "";
-                this.onInput();
+                this.updateText();
+            },
+            updateText() {
+                if (this.trimed) {
+                    this.$emit("update:text", this.inputString.trim());
+                }
+
+                this.$emit("update:text", this.inputString);
             },
             onInput() {
-                this.$emit("update:text", this.inputString);
+                if (this.reactOnInput) {
+                    this.updateText();
+                }
+            },
+            onChange() {
+                if (this.reactOnChange) {
+                    this.updateText();
+                }
             },
             focus() {
                 this.$refs.input.focus();
