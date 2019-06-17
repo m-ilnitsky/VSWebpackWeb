@@ -31,17 +31,40 @@ var contacts = [
 
 var id = contacts.length;
 
+function simplifyPhone(phoneNumber) {
+    return phoneNumber.trim()
+        .replace(/[+]/g, "")
+        .replace(/[(]/g, "")
+        .replace(/[)]/g, "")
+        .replace(/[-]/g, "");
+};
+
 /* GET home page. */
-router.get('/', function (req, res, next) {
+router.get("/", function (req, res, next) {
     res.render('index', { title: 'Express' });
 });
 
-router.get('/getContacts', function (req, res) {
+router.get("/getContacts", function (req, res) {
     var term = (req.query.term || "").toUpperCase();
 
     res.send({
         contacts: contacts.filter(function (contact) {
             return term === ""
+                || simplifyPhone(contact.phone).indexOf(term) >= 0
+                || contact.phone.trim().toUpperCase().indexOf(term) >= 0
+                || contact.name.trim().toUpperCase().indexOf(term) >= 0
+                || contact.family.trim().toUpperCase().indexOf(term) >= 0;
+        })
+    });
+});
+
+router.post("/reloadContacts", function (req, res) {
+    var term = (req.body.term || "").toUpperCase();
+
+    res.send({
+        contacts: contacts.filter(function (contact) {
+            return term === ""
+                || simplifyPhone(contact.phone).indexOf(term) >= 0
                 || contact.phone.trim().toUpperCase().indexOf(term) >= 0
                 || contact.name.trim().toUpperCase().indexOf(term) >= 0
                 || contact.family.trim().toUpperCase().indexOf(term) >= 0;
@@ -63,6 +86,34 @@ router.post("/deleteContact", function (req, res) {
     }
 
     res.send({ success: false });
+});
+
+router.post("/deleteContacts", function (req, res) {
+    var ids = req.body.ids;
+
+    var oldCount = contacts.length;
+
+    contacts = contacts.filter(function (contact) {
+        return !(ids.some(function (id) {
+            return id === contact.id;
+        }));
+    });
+
+    var newCount = contacts.length;
+    var deleteCount = oldCount - newCount;
+
+    if (deleteCount > 0) {
+        res.send({
+            success: true,
+            deleteCount: deleteCount
+        });
+        return;
+    }
+
+    res.send({
+        success: false,
+        deleteCount: 0
+    });
 });
 
 router.post("/addContact", function (req, res) {

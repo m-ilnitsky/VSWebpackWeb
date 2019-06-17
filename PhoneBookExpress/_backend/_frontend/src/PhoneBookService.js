@@ -5,6 +5,14 @@ export default class PhoneBookService {
         return $.get("/getContacts?term=" + searchTerm);
     }
 
+    reloadContacts(searchTerm) {
+        return $.post({
+            url: "/reloadContacts",
+            contentType: "application/json",
+            data: JSON.stringify({ term: searchTerm })
+        });
+    }
+
     addContact(contact) {
         return $.post({
             url: "/addContact",
@@ -23,7 +31,7 @@ export default class PhoneBookService {
 
     deleteContacts(ids) {
         return $.post({
-            url: "/deleteContact",
+            url: "/deleteContacts",
             contentType: "application/json",
             data: JSON.stringify({ ids: ids })
         });
