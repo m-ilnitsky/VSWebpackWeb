@@ -102,6 +102,7 @@
     <Content Include="_backend\_frontend\src\WindowForMessageDialog.vue" />
     <Content Include="_backend\_frontend\package-lock.json" />
     <Content Include="_backend\_frontend\package.json" />
+    <Content Include="_backend\bin\www" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="_backend\public\" />
