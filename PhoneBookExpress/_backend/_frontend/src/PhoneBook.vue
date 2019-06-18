@@ -212,6 +212,10 @@
 
     import { contactString } from "./contactString.js";
 
+    const IS_PHONE_NUMBER = 1;
+    const CONTACT_NOT_FOUND = 11;
+    const ALL_CONTACTS_NOT_FOUND = 21;
+
     export default {
         data() {
             return {
@@ -302,9 +306,7 @@
                         });
                         this.implementChecked();
                         this.isContacts = this.contacts.length > 0;
-                    })
-                    .fail()
-                    .always();
+                    });
             },
             reloadContacts(filter) {
                 this.service.reloadContacts(filter)
@@ -315,9 +317,7 @@
                         });
                         this.implementChecked();
                         this.isContacts = this.contacts.length > 0;
-                    })
-                    .fail()
-                    .always();
+                    });
             },
             implementChecked() {
                 let idIndex = 0;
@@ -455,7 +455,7 @@
                             this.newContact.phone = "";
                             this.$refs.newPhone.focus();
                         } else {
-                            if (res.error === 1) {
+                            if (res.errorCode === IS_PHONE_NUMBER) {
                                 this.newContact.isInvalidPhone = true;
                                 this.newContact.invalidPhoneFeedback = res.message;
                                 this.$refs.newPhone.focus();
@@ -464,9 +464,7 @@
                                 $(this.$refs.errorMessage.$el).modal("show");
                             }
                         }
-                    })
-                    .fail()
-                    .always();
+                    });
             },
             confirmRemove(contact) {
                 this.confirmRemoveContact.message = "Вы действительно хотите удалить контакт?";
@@ -489,7 +487,7 @@
                             this.reloadContacts(this.filterString);
                             $(this.$refs.confirmDialogRemoveContact.$el).modal("hide");
 
-                            if (res.error === 11) {
+                            if (res.errorCode === CONTACT_NOT_FOUND) {
                                 this.errorMessage = "Ошибка удаления контакта! : " + res.message;
                             } else {
                                 this.errorMessage = "Ошибка удаления контакта!";
@@ -497,9 +495,7 @@
 
                             $(this.$refs.errorMessage.$el).modal("show");
                         }
-                    })
-                    .fail()
-                    .always();
+                    });
             },
             removeCheckedContacts() {
                 const ids = this.contacts.filter(contact => contact.checked)
@@ -513,7 +509,7 @@
                         } else {
                             this.reloadContacts(this.filterString);
 
-                            if (res.error === 21) {
+                            if (res.errorCode === ALL_CONTACTS_NOT_FOUND) {
                                 this.errorMessage = "Ошибка удаления контактов! : " + res.message;
                             } else {
                                 this.errorMessage = "Ошибка удаления контактов!";
@@ -521,9 +517,7 @@
 
                             $(this.$refs.errorMessage.$el).modal("show");
                         }
-                    })
-                    .fail()
-                    .always();
+                    });
             },
             confirmRemoveChecked() {
                 if (this.checkedContactsCount === 0) {
@@ -596,15 +590,22 @@
                                 $(this.$refs.editDialog.$el).modal("hide");
                                 this.isEditing = false;
                             } else {
-                                if (res.error === 31) {
+                                if (res.errorCode === IS_PHONE_NUMBER) {
                                     this.editedContact.isInvalidPhone = true;
                                     this.editedContact.invalidPhoneFeedback = res.message;
                                     this.$refs.editDialog.$refs.editPhone.focus();
+                                } else if (res.errorCode === CONTACT_NOT_FOUND) {
+                                    $(this.$refs.editDialog.$el).modal("hide");
+                                    this.isEditing = false;
+                                    this.editIndex = -1;
+
+                                    this.reloadContacts(this.filterString);
+
+                                    this.errorMessage = "Ошибка изменения контакта! : " + res.message;
+                                    $(this.$refs.errorMessage.$el).modal("show");
                                 }
                             }
-                        })
-                        .fail()
-                        .always();
+                        });
                 } else {
                     $(this.$refs.editDialog.$el).modal("hide");
                     this.isEditing = false;

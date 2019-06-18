@@ -2,31 +2,31 @@ var express = require('express');
 var router = express.Router();
 
 var contacts = [
-    { id: 0, family: "Иванов", name: "Василий", phone: "+7(383)123321" },
-    { id: 1, family: "Васильев", name: "Дмитрий", phone: "+7(383)234234" },
-    { id: 2, family: "Дмитриев", name: "Иоган", phone: "+7(383)345345" },
-    { id: 3, family: "Йохансон", name: "Скарлетт", phone: "+7(383)456456" },
-    { id: 4, family: "Скарлетсон", name: "Рагнар", phone: "+7(383)567567" },
-    { id: 5, family: "Рагнарсон", name: "Сигурд", phone: "+7(383)678678" },
-    { id: 6, family: "Сигурдсон", name: "Снорри", phone: "+7(383)789789" },
-    { id: 7, family: "Стурлуссон", name: "Снорри", phone: "+7(383)890890" },
-    { id: 8, family: "Барбаросса", name: "Фридрих", phone: "+7(383)779988" },
-    { id: 9, family: "Арагонский", name: "Фердинанд", phone: "+7(495)123456" },
-    { id: 10, family: "Македонский", name: "Александр", phone: "+7(495)112233" },
-    { id: 11, family: "Итакский", name: "Одиссей", phone: "+7123456789" },
-    { id: 12, family: "Африканский", name: "Сципион", phone: "+7123456123" },
-    { id: 13, family: "Кортес", name: "Эрнан", phone: "+7(812)654321" },
-    { id: 14, family: "Юлий Цезарь", name: "Гай", phone: "+7(812)123123" },
+    { id: 0, family: "Иванов", name: "Василий", phone: "+7(383)3123321" },
+    { id: 1, family: "Васильев", name: "Дмитрий", phone: "+7(383)3234234" },
+    { id: 2, family: "Дмитриев", name: "Иоган", phone: "+7(383)3345345" },
+    { id: 3, family: "Йохансон", name: "Скарлетт", phone: "+7(383)3456456" },
+    { id: 4, family: "Скарлетсон", name: "Рагнар", phone: "+7(383)3567567" },
+    { id: 5, family: "Рагнарсон", name: "Сигурд", phone: "+7(383)3678678" },
+    { id: 6, family: "Сигурдсон", name: "Снорри", phone: "+7(383)2789789" },
+    { id: 7, family: "Стурлуссон", name: "Снорри", phone: "+7(383)2890890" },
+    { id: 8, family: "Барбаросса", name: "Фридрих", phone: "+7(383)2779988" },
+    { id: 9, family: "Арагонский", name: "Фердинанд", phone: "+7(495)7123456" },
+    { id: 10, family: "Македонский", name: "Александр", phone: "+7(495)7112233" },
+    { id: 11, family: "Итакский", name: "Одиссей", phone: "+71234567890" },
+    { id: 12, family: "Африканский", name: "Сципион", phone: "+71234561234" },
+    { id: 13, family: "Кортес", name: "Эрнан", phone: "+7(812)765-43-21" },
+    { id: 14, family: "Юлий Цезарь", name: "Гай", phone: "+7(812)712-31-23" },
     { id: 15, family: "", name: "Ксенофонт", phone: "777-57-73" },
     { id: 16, family: "", name: "Фукидид", phone: "777-57-72" },
     { id: 17, family: "", name: "Геродод", phone: "777-57-71" },
     { id: 18, family: "", name: "Аристотель", phone: "577-57-73" },
     { id: 19, family: "", name: "Платон", phone: "577-57-72" },
-    { id: 20, family: "Плюшкины", name: "", phone: "8-800-12-37-71" },
-    { id: 21, family: "Неваляшкины", name: "", phone: "8-800-123-772" },
-    { id: 22, family: "Поваляшкины", name: "", phone: "8-800-123-773" },
-    { id: 23, family: "Деточкины", name: "", phone: "8-800-123-774" },
-    { id: 24, family: "Мышкины", name: "", phone: "8-800-123-775" }
+    { id: 20, family: "Плюшкины", name: "", phone: "8-800-123-37-71" },
+    { id: 21, family: "Неваляшкины", name: "", phone: "8-800-123-77-22" },
+    { id: 22, family: "Поваляшкины", name: "", phone: "8-800-123-77-33" },
+    { id: 23, family: "Деточкины", name: "", phone: "8-800-123-77-44" },
+    { id: 24, family: "Мышкины", name: "", phone: "8-800-123-77-55" }
 ];
 
 var id = contacts.length;
@@ -57,6 +57,10 @@ router.get("/getContacts", function (req, res) {
         })
     });
 });
+
+const IS_PHONE_NUMBER = 1;
+const CONTACT_NOT_FOUND = 11;
+const ALL_CONTACTS_NOT_FOUND = 21;
 
 router.post("/reloadContacts", function (req, res) {
     var term = (req.body.term || "").toUpperCase();
@@ -89,7 +93,7 @@ router.post("/deleteContact", function (req, res) {
 
     res.send({
         success: false,
-        error: 11,
+        errorCode: CONTACT_NOT_FOUND,
         message: "Контакт не найден!"
     });
 });
@@ -100,9 +104,7 @@ router.post("/deleteContacts", function (req, res) {
     var oldCount = contacts.length;
 
     contacts = contacts.filter(function (contact) {
-        return !(ids.some(function (id) {
-            return id === contact.id;
-        }));
+        return ids.indexOf(contact.id) < 0;
     });
 
     var newCount = contacts.length;
@@ -119,7 +121,7 @@ router.post("/deleteContacts", function (req, res) {
     res.send({
         success: false,
         deleteCount: 0,
-        error: 21,
+        errorCode: ALL_CONTACTS_NOT_FOUND,
         message: "Контакты не найдены!"
     });
 });
@@ -134,7 +136,7 @@ router.post("/addContact", function (req, res) {
     if (index >= 0) {
         res.send({
             success: false,
-            error: 1,
+            errorCode: IS_PHONE_NUMBER,
             message: "Такой номер уже имеется на сервере"
         });
         return;
@@ -148,20 +150,29 @@ router.post("/addContact", function (req, res) {
 });
 
 router.post("/editContact", function (req, res) {
-    var editedContact = req.body.request;
+    const editedContact = req.body.request;
 
-    var contactIndex = contacts.findIndex(function (contact) {
+    const contactIndex = contacts.findIndex(function (contact) {
         return contact.id === editedContact.id;
     });
 
-    var phoneIndex = contacts.findIndex(function (contact, index) {
+    if (contactIndex < 0) {
+        res.send({
+            success: false,
+            errorCode: CONTACT_NOT_FOUND,
+            message: "Контакт не найден!"
+        });
+        return;
+    }
+
+    const phoneIndex = contacts.findIndex(function (contact, index) {
         return index != contactIndex && simplifyPhone(contact.phone) === simplifyPhone(editedContact.phone);
     });
 
     if (phoneIndex >= 0) {
         res.send({
             success: false,
-            error: 31,
+            errorCode: IS_PHONE_NUMBER,
             message: "Такой номер уже имеется на сервере"
         });
         return;

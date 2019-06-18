@@ -5,43 +5,31 @@ export default class PhoneBookService {
         return $.get("/getContacts?term=" + searchTerm);
     }
 
-    reloadContacts(searchTerm) {
+    post(url, data) {
         return $.post({
-            url: "/reloadContacts",
+            url: url,
             contentType: "application/json",
-            data: JSON.stringify({ term: searchTerm })
+            data: JSON.stringify(data)
         });
+    }
+
+    reloadContacts(searchTerm) {
+        return this.post("/reloadContacts", { term: searchTerm });
     }
 
     addContact(contact) {
-        return $.post({
-            url: "/addContact",
-            contentType: "application/json",
-            data: JSON.stringify({ request: contact })
-        });
+        return this.post("/addContact", { request: contact });
     }
 
     editContact(contact) {
-        return $.post({
-            url: "/editContact",
-            contentType: "application/json",
-            data: JSON.stringify({ request: contact })
-        });
+        return this.post("/editContact", { request: contact });
     }
 
     deleteContact(id) {
-        return $.post({
-            url: "/deleteContact",
-            contentType: "application/json",
-            data: JSON.stringify({ id: id })
-        });
+        return this.post("/deleteContact", { id: id });
     }
 
     deleteContacts(ids) {
-        return $.post({
-            url: "/deleteContacts",
-            contentType: "application/json",
-            data: JSON.stringify({ ids: ids })
-        });
+        return this.post("/deleteContacts", { ids: ids });
     }
 }
