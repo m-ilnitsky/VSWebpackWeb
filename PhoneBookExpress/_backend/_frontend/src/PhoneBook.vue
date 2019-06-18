@@ -89,7 +89,7 @@
                                   :trimed="true"
                                   button-title="Очистить поле поиска"
                                   :text.sync="filterString"
-                                  :show-popover="!isFilteredRows" />
+                                  :show-popover="!isContacts" />
                 </div>
                 <table class="table table-sm table-striped table-hover phone-book_table">
                     <thead class="thead-dark">
@@ -166,14 +166,14 @@
             </div>
         </div>
 
+        <message-dialog ref="errorMessage"
+                        title="Ошибка"
+                        :top-message="errorMessage" />
+
         <message-dialog ref="messageDialog"
                         title="Сообщение"
                         top-message="Не выбрано ни одного контакта!"
                         bottom-message="Для выполнения операции выберите контакты!" />
-
-        <message-dialog ref="errorMessage"
-                        title="Ошибка"
-                        :top-message="errorMessage" />
 
         <confirm-dialog ref="confirmDialog"
                         title="Запрос подтверждения"
@@ -210,11 +210,14 @@
     import PhoneBookService from "./PhoneBookService.js";
     import Toast from "./Toast.js";
 
+    import { contactString } from "./contactString.js";
+
     export default {
         data() {
             return {
                 contacts: [],
-                id: 0,
+                checkedContacts: [],
+                isContacts: true,
                 newContact: {
                     family: "",
                     name: "",
@@ -241,10 +244,7 @@
                 isEditing: false,
                 editIndex: -1,
                 filterString: "",
-                isFilter: false,
-                isFilteredRows: true,
                 checkedAll: false,
-                errorMessage: "",
                 confirmRemoveContact: {
                     message: "",
                     family: "",
@@ -255,6 +255,7 @@
                     message: "",
                     okButtonText: ""
                 },
+                errorMessage: "",
                 windowWidth: window.innerWidth,
                 service: new PhoneBookService(),
                 toast: new Toast("#toastBox")
@@ -276,20 +277,7 @@
                 }
 
                 return "bottom";
-            },/*
-            filteredContacts() {
-                const str = this.filterString.trim();
-
-                if (str === "") {
-                    this.isFilter = false;
-                    return this.contacts;
-                }
-
-                this.isFilter = true;
-
-                return this.contacts.filter(contact =>
-                    contact.family.includes(str) || contact.name.includes(str) || contact.phone.includes(str));
-            },*/
+            },
             checkedContactsCount() {
                 return this.contacts.reduce((number, contact) => {
                     if (contact.checked) {
@@ -297,61 +285,75 @@
                     }
                     return number;
                 }, 0);
-            }/*,
-            filteredContactsCount() {
-                if (this.contacts.length === 0) {
-                    this.isFilteredRows = true;
-                    return 0;
-                }
-
-                this.isFilteredRows = this.filteredContacts.length > 0;
-
-                return this.filteredContacts.length;
-            }*/
+            }
         },
         watch: {
             filterString(newString) {
                 this.reloadContacts(newString);
-
-                this.isFilteredRows = this.contacts.length > 0;
             }
         },
         methods: {
             loadContacts(filter) {
                 this.service.getContacts(filter)
-                    .done(response => this.contacts = response.contacts.map(contact => {
-                        contact.checked = false;
-                        return contact;
-                    }))
+                    .done(response => {
+                        this.contacts = response.contacts.map(contact => {
+                            contact.checked = false;
+                            return contact;
+                        });
+                        this.implementChecked();
+                        this.isContacts = this.contacts.length > 0;
+                    })
                     .fail()
                     .always();
             },
             reloadContacts(filter) {
                 this.service.reloadContacts(filter)
-                    .done(response => this.contacts = response.contacts.map(contact => {
-                        contact.checked = false;
-                        return contact;
-                    }))
+                    .done(response => {
+                        this.contacts = response.contacts.map(contact => {
+                            contact.checked = false;
+                            return contact;
+                        });
+                        this.implementChecked();
+                        this.isContacts = this.contacts.length > 0;
+                    })
                     .fail()
                     .always();
             },
-            getContactString(number) {
-                const twoDigits = number % 100;
-                const lastDigit = number % 10;
+            implementChecked() {
+                let idIndex = 0;
+                let contactIndex = 0;
 
-                if ((twoDigits >= 5 && twoDigits <= 20) || (lastDigit === 0) || (lastDigit >= 5 && lastDigit <= 9)) {
-                    return "контактов";
+                while (idIndex < this.checkedContacts.length && contactIndex < this.contacts.length) {
+                    if (this.contacts[contactIndex].id === this.checkedContacts[idIndex]) {
+                        this.contacts[contactIndex].checked = true;
+                        contactIndex++;
+                        idIndex++;
+                    } else if (this.contacts[contactIndex].id > this.checkedContacts[idIndex]) {
+                        idIndex++;
+                    } else {
+                        contactIndex++;
+                    }
                 }
 
-                if (lastDigit === 1) {
-                    return "контакт";
-                }
+                this.updateCheckAll();
+            },
+            updateCheckedContacts() {
+                this.checkedContacts = this.contacts
+                    .filter(contact => contact.checked)
+                    .map(contact => contact.id);
+            },
+            updateCheckAll() {
+                if (this.contacts.length === 0) {
+                    this.checkedAll = false;
+                } else {
+                    const isNoChecked = this.contacts.some(element => !element.checked);
 
-                if (lastDigit >= 2 && lastDigit <= 4) {
-                    return "контакта";
+                    if (this.checkedAll && isNoChecked) {
+                        this.checkedAll = false;
+                    } else if (!this.checkedAll && !isNoChecked) {
+                        this.checkedAll = true;
+                    }
                 }
-
-                return "хм..мммм";
             },
             checkAll() {
                 if (!this.checkedAll) {
@@ -366,19 +368,16 @@
                         this.contacts.forEach(element => element.checked = true);
                     }
                 }
+
+                this.updateCheckedContacts();
             },
             check(contact) {
                 contact.checked = !contact.checked;
 
-                const isNoChecked = this.contacts.some(element => !element.checked);
+                this.updateCheckAll();
 
-                if (this.checkedAll && isNoChecked) {
-                    this.checkedAll = false;
-                }
-            },/*
-            resetFilter() {
-                this.filterString = "";
-            },*/
+                this.updateCheckedContacts();
+            },
             copyContact(contact) {
                 this.newContact.family = contact.family;
                 this.newContact.name = contact.name;
@@ -423,13 +422,13 @@
 
                 if (this.newContact.phone.trim().length === 0) {
                     this.newContact.isInvalidPhone = true;
-                    this.newContact.invalidPhoneFeedback = "Нет номера телефона.";
+                    this.newContact.invalidPhoneFeedback = "Нет номера телефона";
                 } else if (!this.isCorrectPhone(this.newContact.phone.trim())) {
                     this.newContact.isInvalidPhone = true;
-                    this.newContact.invalidPhoneFeedback = "Некорректный номер телефона.";
+                    this.newContact.invalidPhoneFeedback = "Некорректный номер телефона";
                 } else if (this.hasPhone(this.newContact.phone)) {
                     this.newContact.isInvalidPhone = true;
-                    this.newContact.invalidPhoneFeedback = "Такой номер телефона уже есть.";
+                    this.newContact.invalidPhoneFeedback = "Такой номер телефона уже есть";
                 }
 
                 if (this.newContact.isInvalidFamily || this.newContact.isInvalidName) {
@@ -449,11 +448,22 @@
                 };
 
                 this.service.addContact(contact)
-                    .done(() => {
-                        this.toast.create("Создание", "Добавлен контакт: " + this.newContact.family + " " + this.newContact.name + " " + this.newContact.phone, 6000);
-                        this.reloadContacts(this.filterString);
-                        this.newContact.phone = "";
-                        this.$refs.newPhone.focus();
+                    .done((res) => {
+                        if (res.success) {
+                            this.toast.create("Создание", "Добавлен контакт: " + this.newContact.family + " " + this.newContact.name + " " + this.newContact.phone, 6000);
+                            this.reloadContacts(this.filterString);
+                            this.newContact.phone = "";
+                            this.$refs.newPhone.focus();
+                        } else {
+                            if (res.error === 1) {
+                                this.newContact.isInvalidPhone = true;
+                                this.newContact.invalidPhoneFeedback = res.message;
+                                this.$refs.newPhone.focus();
+                            } else {
+                                this.errorMessage = "Ошибка добавления контакта!"
+                                $(this.$refs.errorMessage.$el).modal("show");
+                            }
+                        }
                     })
                     .fail()
                     .always();
@@ -470,11 +480,25 @@
             },
             removeContact() {
                 this.service.deleteContact(this.contactForRemove.id)
-                    .done(() => {
-                        this.toast.create("Удаление", "Удалён контакт: " + this.contactForRemove.family + " " + this.contactForRemove.name + " " + this.contactForRemove.phone, 6000);
-                        this.reloadContacts(this.filterString);
-                        $(this.$refs.confirmDialogRemoveContact.$el).modal("hide");
+                    .done((res) => {
+                        if (res.success) {
+                            this.toast.create("Удаление", "Удалён контакт: " + this.contactForRemove.family + " " + this.contactForRemove.name + " " + this.contactForRemove.phone, 6000);
+                            this.reloadContacts(this.filterString);
+                            $(this.$refs.confirmDialogRemoveContact.$el).modal("hide");
+                        } else {
+                            this.reloadContacts(this.filterString);
+                            $(this.$refs.confirmDialogRemoveContact.$el).modal("hide");
+
+                            if (res.error === 11) {
+                                this.errorMessage = "Ошибка удаления контакта! : " + res.message;
+                            } else {
+                                this.errorMessage = "Ошибка удаления контакта!";
+                            }
+
+                            $(this.$refs.errorMessage.$el).modal("show");
+                        }
                     })
+                    .fail()
                     .always();
             },
             removeCheckedContacts() {
@@ -483,9 +507,22 @@
 
                 this.service.deleteContacts(ids)
                     .done((res) => {
-                        this.toast.create("Удаление", "Удалено " + res.deleteCount + " " + this.getContactString(res.deleteCount), 6000);
-                        this.reloadContacts(this.filterString);
+                        if (res.success) {
+                            this.toast.create("Удаление", "Удалено " + res.deleteCount + " " + contactString(res.deleteCount), 6000);
+                            this.reloadContacts(this.filterString);
+                        } else {
+                            this.reloadContacts(this.filterString);
+
+                            if (res.error === 21) {
+                                this.errorMessage = "Ошибка удаления контактов! : " + res.message;
+                            } else {
+                                this.errorMessage = "Ошибка удаления контактов!";
+                            }
+
+                            $(this.$refs.errorMessage.$el).modal("show");
+                        }
                     })
+                    .fail()
                     .always();
             },
             confirmRemoveChecked() {
@@ -495,7 +532,7 @@
                     const checkedContacts = this.contacts.filter(contact => contact.checked);
                     this.confirmRemove(checkedContacts[0]);
                 } else {
-                    this.confirmDialog.message = "Вы действительно хотите удалить " + this.checkedContactsCount + " " + this.getContactString(this.checkedContactsCount) + "?";
+                    this.confirmDialog.message = "Вы действительно хотите удалить " + this.checkedContactsCount + " " + contactString(this.checkedContactsCount) + "?";
                     this.confirmDialog.okButtonText = "Удалить все";
                     $(this.$refs.confirmDialog.$el).modal("show");
                 }
@@ -517,13 +554,13 @@
 
                 if (this.editedContact.phone.trim().length === 0) {
                     this.editedContact.isInvalidPhone = true;
-                    this.editedContact.invalidPhoneFeedback = "Нет номера телефона.";
+                    this.editedContact.invalidPhoneFeedback = "Нет номера телефона";
                 } else if (!this.isCorrectPhone(this.editedContact.phone.trim())) {
                     this.editedContact.isInvalidPhone = true;
-                    this.editedContact.invalidPhoneFeedback = "Некорректный номер телефона.";
+                    this.editedContact.invalidPhoneFeedback = "Некорректный номер телефона";
                 } else if ((this.editedContact.initPhone.trim() !== this.editedContact.phone.trim()) && this.hasPhone(this.editedContact.phone)) {
                     this.editedContact.isInvalidPhone = true;
-                    this.editedContact.invalidPhoneFeedback = "Такой номер телефона уже есть.";
+                    this.editedContact.invalidPhoneFeedback = "Такой номер телефона уже есть";
                 }
 
                 if (this.editedContact.isInvalidFamily || this.editedContact.isInvalidName) {
@@ -539,16 +576,39 @@
                 if (this.editedContact.initFamily.trim() !== this.editedContact.family.trim()
                     || this.editedContact.initName.trim() !== this.editedContact.name.trim()
                     || this.editedContact.initPhone.trim() !== this.editedContact.phone.trim()) {
+
                     this.contactForEdit.family = this.editedContact.family.trim();
                     this.contactForEdit.name = this.editedContact.name.trim();
                     this.contactForEdit.phone = this.editedContact.phone.trim();
-                    this.contactForEdit.checked = false;
 
-                    this.createToast("Редактирование", "Изменён контакт: " + this.editedContact.family + " " + this.editedContact.name + " " + this.editedContact.phone);
+                    this.service.editContact(this.contactForEdit)
+                        .done((res) => {
+                            if (res.success) {
+                                this.toast.create("Редактирование", "Изменён контакт: " + this.contactForEdit.family + " " + this.contactForEdit.name + " " + this.contactForEdit.phone, 6000);
+                                this.reloadContacts(this.filterString);
+
+                                this.contacts
+                                    .filter(contact => contact.id === this.contactForEdit.id)
+                                    .forEach(contact => contact.checked = false);
+
+                                this.updateCheckedContacts();
+
+                                $(this.$refs.editDialog.$el).modal("hide");
+                                this.isEditing = false;
+                            } else {
+                                if (res.error === 31) {
+                                    this.editedContact.isInvalidPhone = true;
+                                    this.editedContact.invalidPhoneFeedback = res.message;
+                                    this.$refs.editDialog.$refs.editPhone.focus();
+                                }
+                            }
+                        })
+                        .fail()
+                        .always();
+                } else {
+                    $(this.$refs.editDialog.$el).modal("hide");
+                    this.isEditing = false;
                 }
-
-                $(this.$refs.editDialog.$el).modal("hide");
-                this.isEditing = false;
             },
             editContact(contact) {
                 this.editedContact.family = contact.family;
@@ -574,18 +634,18 @@
                     return;
                 }
 
-                const checkedContacts = this.filteredContacts.filter(contact => contact.checked);
+                const checkedContacts = this.contacts.filter(contact => contact.checked);
 
                 if (this.checkedContactsCount === 1) {
                     this.editContact(checkedContacts[0]);
                 } else {
-                    this.confirmDialog.message = "Вы действительно хотите изменить " + this.checkedContactsCount + " " + this.getContactString(this.checkedContactsCount) + "?";
+                    this.confirmDialog.message = "Вы действительно хотите изменить " + this.checkedContactsCount + " " + contactString(this.checkedContactsCount) + "?";
                     this.confirmDialog.okButtonText = "Изменить";
                     $(this.$refs.confirmDialog.$el).modal("show");
                 }
             },
             editCheckedContacts() {
-                const checkedContacts = this.filteredContacts.filter(contact => contact.checked);
+                const checkedContacts = this.contacts.filter(contact => contact.checked);
 
                 this.isEditing = false;
                 this.editIndex = 0;
@@ -616,40 +676,7 @@
                 }
 
                 $(this.$refs.confirmDialog.$el).modal("hide");
-            }/*,
-            createToast(title, message) {
-                const divToast = $("<div></div>").addClass("toast")
-                    .prop("role", "alert")
-                    .prop("aria-live", "assertive")
-                    .prop("aria-atomic", "true");
-
-                const divToastHeader = $("<div></div>").addClass("toast-header")
-                    .appendTo(divToast);
-
-                $("<strong></strong>").addClass("mr-auto")
-                    .text(title)
-                    .appendTo(divToastHeader);
-
-                const buttonClose = $("<button></button>").addClass("ml-2 mb-1 close")
-                    .prop("data-dismiss", "toast")
-                    .prop("aria-label", "Close")
-                    .click(function () {
-                        divToast.toast("hide");
-                    })
-                    .appendTo(divToastHeader);
-
-                $("<span>&times;</span>")
-                    .prop("aria-hidden", "true")
-                    .appendTo(buttonClose);
-
-                $("<div></div>").addClass("toast-body")
-                    .text(message)
-                    .appendTo(divToast);
-
-                divToast.appendTo("#toastBox");
-                divToast.toast({ delay: 60000 });
-                divToast.toast("show");
-            }*/
+            }
         },
         mounted() {
             window.onresize = () => {

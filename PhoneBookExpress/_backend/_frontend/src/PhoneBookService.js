@@ -21,6 +21,14 @@ export default class PhoneBookService {
         });
     }
 
+    editContact(contact) {
+        return $.post({
+            url: "/editContact",
+            contentType: "application/json",
+            data: JSON.stringify({ request: contact })
+        });
+    }
+
     deleteContact(id) {
         return $.post({
             url: "/deleteContact",

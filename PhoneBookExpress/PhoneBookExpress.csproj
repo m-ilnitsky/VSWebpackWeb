@@ -75,7 +75,9 @@
     <Content Include="_backend\_frontend\icon-close.png" />
     <Content Include="_backend\_frontend\icon-edit.png" />
     <Content Include="_backend\_frontend\src\App.js" />
+    <Content Include="_backend\_frontend\src\contactString.js" />
     <Content Include="_backend\_frontend\src\PhoneBookService.js" />
+    <Content Include="_backend\_frontend\src\Toast.js" />
     <Content Include="_backend\_frontend\webpack.config.js" />
   </ItemGroup>
   <ItemGroup>
