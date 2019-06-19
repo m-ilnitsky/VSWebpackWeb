@@ -2,7 +2,10 @@
 
 export default class PhoneBookService {
     getContacts(searchTerm) {
-        return $.get("/getContacts?term=" + searchTerm);
+        return $.get({
+            url: "/getContacts?term=" + searchTerm,
+            cache: false
+        });
     }
 
     post(url, data) {

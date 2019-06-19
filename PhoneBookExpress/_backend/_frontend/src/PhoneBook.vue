@@ -396,7 +396,7 @@
                 return isPhone;
             },
             isCorrectPhone(phoneNumber) {
-                const phoneRegexp = /^(\+[0-9]+)?([(][0-9]+[)])?([\-0-9]+)?[0-9]$/;
+                const phoneRegexp = /^(\+)?([0-9]+)?([(][0-9]+[)])?([\-0-9]+)?[0-9]$/;
                 return phoneRegexp.test(phoneNumber);
             },
             addContact() {
@@ -681,8 +681,6 @@
                     return self.tooltipPlacement;
                 }
             });
-
-            $.ajaxSetup({ cash: false });
 
             this.loadContacts("");
 
