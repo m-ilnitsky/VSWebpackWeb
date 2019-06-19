@@ -293,23 +293,12 @@
         },
         watch: {
             filterString(newString) {
-                this.reloadContacts(newString);
+                this.loadContacts(newString);
             }
         },
         methods: {
             loadContacts(filter) {
                 this.service.getContacts(filter)
-                    .done(response => {
-                        this.contacts = response.contacts.map(contact => {
-                            contact.checked = false;
-                            return contact;
-                        });
-                        this.implementChecked();
-                        this.isContacts = this.contacts.length > 0;
-                    });
-            },
-            reloadContacts(filter) {
-                this.service.reloadContacts(filter)
                     .done(response => {
                         this.contacts = response.contacts.map(contact => {
                             contact.checked = false;
@@ -451,7 +440,7 @@
                     .done((res) => {
                         if (res.success) {
                             this.toast.create("Создание", "Добавлен контакт: " + this.newContact.family + " " + this.newContact.name + " " + this.newContact.phone, 6000);
-                            this.reloadContacts(this.filterString);
+                            this.loadContacts(this.filterString);
                             this.newContact.phone = "";
                             this.$refs.newPhone.focus();
                         } else {
@@ -481,10 +470,10 @@
                     .done((res) => {
                         if (res.success) {
                             this.toast.create("Удаление", "Удалён контакт: " + this.contactForRemove.family + " " + this.contactForRemove.name + " " + this.contactForRemove.phone, 6000);
-                            this.reloadContacts(this.filterString);
+                            this.loadContacts(this.filterString);
                             $(this.$refs.confirmDialogRemoveContact.$el).modal("hide");
                         } else {
-                            this.reloadContacts(this.filterString);
+                            this.loadContacts(this.filterString);
                             $(this.$refs.confirmDialogRemoveContact.$el).modal("hide");
 
                             if (res.errorCode === CONTACT_NOT_FOUND) {
@@ -505,9 +494,9 @@
                     .done((res) => {
                         if (res.success) {
                             this.toast.create("Удаление", "Удалено " + res.deleteCount + " " + contactString(res.deleteCount), 6000);
-                            this.reloadContacts(this.filterString);
+                            this.loadContacts(this.filterString);
                         } else {
-                            this.reloadContacts(this.filterString);
+                            this.loadContacts(this.filterString);
 
                             if (res.errorCode === ALL_CONTACTS_NOT_FOUND) {
                                 this.errorMessage = "Ошибка удаления контактов! : " + res.message;
@@ -579,7 +568,7 @@
                         .done((res) => {
                             if (res.success) {
                                 this.toast.create("Редактирование", "Изменён контакт: " + this.contactForEdit.family + " " + this.contactForEdit.name + " " + this.contactForEdit.phone, 6000);
-                                this.reloadContacts(this.filterString);
+                                this.loadContacts(this.filterString);
 
                                 this.contacts
                                     .filter(contact => contact.id === this.contactForEdit.id)
@@ -599,7 +588,7 @@
                                     this.isEditing = false;
                                     this.editIndex = -1;
 
-                                    this.reloadContacts(this.filterString);
+                                    this.loadContacts(this.filterString);
 
                                     this.errorMessage = "Ошибка изменения контакта! : " + res.message;
                                     $(this.$refs.errorMessage.$el).modal("show");
@@ -692,6 +681,8 @@
                     return self.tooltipPlacement;
                 }
             });
+
+            $.ajaxSetup({ cash: false });
 
             this.loadContacts("");
 

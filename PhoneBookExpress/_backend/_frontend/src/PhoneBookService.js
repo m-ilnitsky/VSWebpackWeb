@@ -13,10 +13,6 @@ export default class PhoneBookService {
         });
     }
 
-    reloadContacts(searchTerm) {
-        return this.post("/reloadContacts", { term: searchTerm });
-    }
-
     addContact(contact) {
         return this.post("/addContact", { request: contact });
     }

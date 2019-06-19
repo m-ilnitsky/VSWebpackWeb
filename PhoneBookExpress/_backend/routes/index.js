@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-var contacts = [
+let contacts = [
     { id: 0, family: "Иванов", name: "Василий", phone: "+7(383)3123321" },
     { id: 1, family: "Васильев", name: "Дмитрий", phone: "+7(383)3234234" },
     { id: 2, family: "Дмитриев", name: "Иоган", phone: "+7(383)3345345" },
@@ -29,7 +29,7 @@ var contacts = [
     { id: 24, family: "Мышкины", name: "", phone: "8-800-123-77-55" }
 ];
 
-var id = contacts.length;
+let id = contacts.length;
 
 function simplifyPhone(phoneNumber) {
     return phoneNumber.trim()
@@ -45,7 +45,7 @@ router.get("/", function (req, res, next) {
 });
 
 router.get("/getContacts", function (req, res) {
-    var term = (req.query.term || "").toUpperCase();
+    const term = (req.query.term || "").toUpperCase();
 
     res.send({
         contacts: contacts.filter(function (contact) {
@@ -62,24 +62,10 @@ const IS_PHONE_NUMBER = 1;
 const CONTACT_NOT_FOUND = 11;
 const ALL_CONTACTS_NOT_FOUND = 21;
 
-router.post("/reloadContacts", function (req, res) {
-    var term = (req.body.term || "").toUpperCase();
-
-    res.send({
-        contacts: contacts.filter(function (contact) {
-            return term === ""
-                || simplifyPhone(contact.phone).indexOf(term) >= 0
-                || contact.phone.trim().toUpperCase().indexOf(term) >= 0
-                || contact.name.trim().toUpperCase().indexOf(term) >= 0
-                || contact.family.trim().toUpperCase().indexOf(term) >= 0;
-        })
-    });
-});
-
 router.post("/deleteContact", function (req, res) {
-    var id = req.body.id;
+    const id = req.body.id;
 
-    var index = contacts.findIndex(function (contact) {
+    const index = contacts.findIndex(function (contact) {
         return contact.id === id;
     });
 
@@ -99,16 +85,16 @@ router.post("/deleteContact", function (req, res) {
 });
 
 router.post("/deleteContacts", function (req, res) {
-    var ids = req.body.ids;
+    const ids = req.body.ids;
 
-    var oldCount = contacts.length;
+    const oldCount = contacts.length;
 
     contacts = contacts.filter(function (contact) {
         return ids.indexOf(contact.id) < 0;
     });
 
-    var newCount = contacts.length;
-    var deleteCount = oldCount - newCount;
+    const newCount = contacts.length;
+    const deleteCount = oldCount - newCount;
 
     if (deleteCount > 0) {
         res.send({
@@ -127,9 +113,9 @@ router.post("/deleteContacts", function (req, res) {
 });
 
 router.post("/addContact", function (req, res) {
-    var newContact = req.body.request;
+    const newContact = req.body.request;
 
-    var index = contacts.findIndex(function (contact) {
+    const index = contacts.findIndex(function (contact) {
         return simplifyPhone(contact.phone) === simplifyPhone(newContact.phone);
     });
 
